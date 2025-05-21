@@ -1,44 +1,104 @@
-// Carrega os dados dos mangás
-let mangas = [];
+// Carregamento otimizado de imagens
+const lazyLoad = (target) => {
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src;
+        observer.unobserve(img);
+      }
+    });
+  });
+  io.observe(target);
+};
+
+// Tema escuro/claro
+const themeToggle = document.getElementById('theme-toggle');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+const setTheme = (isDark) => {
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+};
+
+// Verificar preferências do usuário
+const currentTheme = localStorage.getItem('theme') || 
+                    (prefersDark.matches ? 'dark' : 'light');
+setTheme(currentTheme === 'dark');
+
+// Alternar tema
+themeToggle.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'dark';
+  setTheme(isDark);
+});
+
+// Carregar mangás com cache
+let mangasCache = null;
 
 async function loadMangas() {
+  if (mangasCache) return mangasCache;
+  
   try {
-    const response = await fetch('/data/mangas.json');
-    mangas = await response.json();
-    renderMangaList(mangas);
+    const response = await fetch('data/mangas.json');
+    if (!response.ok) throw new Error('Falha ao carregar');
+    
+    mangasCache = await response.json();
+    return mangasCache;
   } catch (error) {
-    console.error('Erro ao carregar mangás:', error);
-    document.getElementById('manga-list').innerHTML = 
-      '<div class="error">Erro ao carregar a lista de mangás</div>';
+    console.error('Erro:', error);
+    return [];
   }
 }
 
-// Renderiza a lista de mangás
-function renderMangaList(mangasToRender) {
+// Renderização otimizada
+function renderMangaList(mangas) {
   const container = document.getElementById('manga-list');
-  
-  if (!mangasToRender.length) {
-    container.innerHTML = '<div class="no-results">Nenhum mangá encontrado</div>';
+  container.innerHTML = '';
+
+  if (!mangas.length) {
+    container.innerHTML = '<p class="no-results">Nenhum mangá encontrado</p>';
     return;
   }
 
-  container.innerHTML = mangasToRender.map(manga => `
-    <article class="manga-card" data-id="${manga.id}">
-      <img src="${manga.coverImage || '/images/default-cover.jpg'}" alt="${manga.title}">
-      <h3>${escapeHtml(manga.title)}</h3>
-      <p>${escapeHtml(manga.author || 'Autor desconhecido')}</p>
-    </article>
-  `).join('');
-
-  // Adiciona event listeners
-  document.querySelectorAll('.manga-card').forEach(card => {
-    card.addEventListener('click', () => {
-      window.location.href = `/manga.html?id=${card.dataset.id}`;
-    });
+  const fragment = document.createDocumentFragment();
+  
+  mangas.forEach(manga => {
+    const card = document.createElement('article');
+    card.className = 'manga-card';
+    card.innerHTML = `
+      <img data-src="${manga.coverImage}" alt="${manga.title}" class="manga-cover">
+      <div class="card-body">
+        <h3>${escapeHtml(manga.title)}</h3>
+        <p>${escapeHtml(manga.author || 'Autor desconhecido')}</p>
+      </div>
+    `;
+    fragment.appendChild(card);
+    lazyLoad(card.querySelector('img'));
   });
+
+  container.appendChild(fragment);
 }
 
-// Função de segurança contra XSS
+// Inicialização
+document.addEventListener('DOMContentLoaded', async () => {
+  const mangas = await loadMangas();
+  renderMangaList(mangas);
+  
+  // Busca
+  document.getElementById('search-btn').addEventListener('click', searchMangas);
+  document.getElementById('search-input').addEventListener('input', searchMangas);
+});
+
+function searchMangas() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const results = mangasCache.filter(manga => 
+    manga.title.toLowerCase().includes(query) || 
+    (manga.tags && manga.tags.some(tag => tag.toLowerCase().includes(query)))
+  );
+  renderMangaList(results);
+}
+
+// Segurança XSS
 function escapeHtml(unsafe) {
   return unsafe.toString()
     .replace(/&/g, "&amp;")
@@ -47,16 +107,3 @@ function escapeHtml(unsafe) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
-// Inicialização
-document.addEventListener('DOMContentLoaded', loadMangas);
-
-// Busca
-document.getElementById('search-btn').addEventListener('click', () => {
-  const query = document.getElementById('search-input').value.toLowerCase();
-  const results = mangas.filter(manga => 
-    manga.title.toLowerCase().includes(query) || 
-    (manga.tags && manga.tags.some(tag => tag.toLowerCase().includes(query)))
-  );
-  renderMangaList(results);
-});

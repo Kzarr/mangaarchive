@@ -1,25 +1,47 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Arquivo pessoal de mangás gratuitos">
   <title>Arquivo de Mangás</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="data/mangas.json" as="fetch" crossorigin>
 </head>
 <body>
-  <header>
-    <h1>Arquivo de Mangás</h1>
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Buscar mangás...">
-      <button id="search-btn">Buscar</button>
+  <!-- Header melhorado -->
+  <header class="main-header">
+    <div class="container">
+      <h1 class="logo" aria-label="Arquivo de Mangás">
+        <svg class="logo-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 5h14v14H5V5zm2 2v10h10V7H7z"/>
+        </svg>
+        Arquivo de Mangás
+      </h1>
+      
+      <div class="search-container">
+        <label for="search-input" class="sr-only">Buscar mangás</label>
+        <input type="search" id="search-input" placeholder="Buscar por título, autor..." aria-label="Campo de busca">
+        <button id="search-btn" aria-label="Pesquisar">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <button id="theme-toggle" aria-label="Alternar tema">
+        <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1-8.313-12.454z"/>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <main id="manga-list">
-    <!-- Lista de mangás será carregada via JavaScript -->
-    <div class="loading">Carregando mangás...</div>
+  <main class="container" id="manga-list">
+    <div class="loading-spinner" aria-hidden="true"></div>
+    <p class="sr-only" aria-live="polite">Carregando lista de mangás</p>
   </main>
 
-  <script src="/js/main.js" type="module"></script>
+  <script src="js/main.js" type="module"></script>
 </body>
 </html>
