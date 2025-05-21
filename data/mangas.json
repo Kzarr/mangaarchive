@@ -1,0 +1,20 @@
+[
+  {
+    "id": "one-piece",
+    "title": "One Piece",
+    "author": "Eiichiro Oda",
+    "coverImage": "/images/covers/OnepieceCover.jpg",
+    "tags": ["aventura", "piratas", "shounen"],
+    "chapters": [
+      {
+        "number": 1,
+        "title": "Romance Dawn",
+        "pages": [
+          "/images/covers/1/I.jpg",
+          "/images/onepieceII.jpg",
+          "/images/onepieceIII.jpg"
+        ]
+      }
+    ]
+  }
+]

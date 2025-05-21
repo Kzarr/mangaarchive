@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leitor de Mangá</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1 id="manga-title"></h1>
+    <h2 id="chapter-title"></h2>
+    <a href="#" id="back-btn" class="back-button">Voltar</a>
+  </header>
+
+  <main class="chapter-viewer">
+    <div class="chapter-controls">
+      <button id="prev-chapter" disabled>Capítulo Anterior</button>
+      <button id="next-chapter">Próximo Capítulo</button>
+    </div>
+
+    <div id="pages-container" class="pages-container">
+      <!-- Páginas serão carregadas aqui -->
+    </div>
+
+    <div class="chapter-controls">
+      <button id="prev-chapter-bottom" disabled>Capítulo Anterior</button>
+      <button id="next-chapter-bottom">Próximo Capítulo</button>
+    </div>
+  </main>
+
+  <script src="/js/chapter.js" type="module"></script>
+</body>
+</html>
